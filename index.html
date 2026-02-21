@@ -1,83 +1,341 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <title>aaaaaamuuaarere.net</title>
-  <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-      font-family: "Segoe UI", "Hiragino Kaku Gothic ProN", sans-serif;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>aaaaaaaaaaamuuaarere wuz heree!</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;600;800&display=swap" rel="stylesheet">
 
-    /* 背景画像 */
-    body {
-      background-image: url("bg.jpeg");
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-    }
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
 
-    /* 暗くするオーバーレイ */
-    .overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.45);
-    }
+body{
+  font-family:'Inter',sans-serif;
+  color:white;
+  overflow-x:hidden;
+  cursor:none;
+  background:url("bg.jpeg") no-repeat center center fixed;
+  background-size:cover;
+}
 
-    /* 中央配置 */
-    .content {
-      position: relative;
-      z-index: 1;
-      width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-    }
+/* 暗めオーバーレイ */
+.overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.55);
+  z-index:-3;
+}
 
-    h1 {
-      color: #ffffff;
-      font-size: 3.5rem;
-      letter-spacing: 0.15em;
-      text-shadow:
-        0 0 10px rgba(255,255,255,0.4),
-        0 0 30px rgba(255,255,255,0.3);
-      animation: fadeIn 2s ease;
-    }
+/* WebGLキャンバス */
+canvas{
+  position:fixed;
+  inset:0;
+  z-index:-2;
+}
 
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
+/* 丸カーソル */
+.cursor{
+  width:18px;
+  height:18px;
+  border-radius:50%;
+  background:rgba(180,180,180,0.9);
+  position:fixed;
+  pointer-events:none;
+  transform:translate(-50%,-50%);
+  mix-blend-mode:difference;
+  transition:transform 0.08s ease;
+}
 
-    @media (max-width: 600px) {
-      h1 {
-        font-size: 2rem;
-        letter-spacing: 0.08em;
-      }
-    }
-  </style>
+/* メインコンテナ */
+.container{
+  max-width:1100px;
+  margin:auto;
+  padding:120px 30px;
+}
+
+/* ガラスカード */
+.glass{
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 20px;
+  padding: 60px;
+  box-shadow: 0 0 40px rgba(0,0,0,0.4);
+}
+
+/* タイトル */
+h1{
+  font-size:clamp(40px,8vw,90px);
+  font-weight:800;
+  letter-spacing:-3px;
+  line-height:1;
+  margin:0;
+}
+
+/* クリック用リンク */
+.flow-text{
+  text-decoration:none;
+  color:white;
+  cursor:pointer;
+  display:inline;
+}
+
+/* 青白に流れる */
+.flow-text.active{
+  background: linear-gradient(
+    90deg,
+    #ffffff 0%,
+    #4da6ff 25%,
+    #ffffff 50%,
+    #4da6ff 75%,
+    #ffffff 100%
+  );
+  background-size:200% auto;
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  animation:flow 2s linear infinite;
+}
+
+@keyframes flow{
+  0%{background-position:0% center;}
+  100%{background-position:200% center;}
+}
+
+/* 時計 */
+.clock{
+  margin-top:25px;
+  font-size:22px;
+  font-weight:600;
+  letter-spacing:2px;
+  opacity:0.85;
+  text-shadow:0 0 10px rgba(255,255,255,0.4);
+}
+
+.subtitle{
+  margin-top:20px;
+  opacity:0.8;
+  font-weight:300;
+}
+
+/* セクション */
+.section{
+  margin-top:120px;
+  opacity:0;
+  transform:translateY(60px);
+  transition:all 1.2s ease;
+}
+
+.section.visible{
+  opacity:1;
+  transform:translateY(0);
+}
+
+h2{
+  font-size:28px;
+  margin-bottom:20px;
+}
+
+p{
+  line-height:1.8;
+  opacity:0.9;
+}
+
+/* 横並びリンク */
+.social-links{
+  margin-top:40px;
+  display:flex;
+  gap:30px;
+  flex-wrap:wrap;
+}
+
+.social-links a{
+  font-weight:600;
+  letter-spacing:1px;
+  opacity:0.7;
+  position:relative;
+  text-decoration:none;
+  color:white;
+  transition:all 0.3s ease;
+}
+
+.social-links a::after{
+  content:'';
+  position:absolute;
+  left:0;
+  bottom:-6px;
+  width:0%;
+  height:2px;
+  background:white;
+  transition:0.3s;
+}
+
+.social-links a:hover{
+  opacity:1;
+  transform:translateY(-3px);
+}
+
+.social-links a:hover::after{
+  width:100%;
+}
+
+.footer-note{
+  margin-top:60px;
+  font-size:14px;
+  opacity:0.75;
+  line-height:1.8;
+}
+
+.cursor-blink{
+  display:inline-block;
+  width:2px;
+  background:white;
+  margin-left:5px;
+  animation:blink 1s infinite;
+}
+
+@keyframes blink{
+  0%,50%,100%{opacity:1;}
+  25%,75%{opacity:0;}
+}
+</style>
 </head>
 <body>
 
-  <div class="overlay"></div>
+<div class="overlay"></div>
+<canvas id="fluid"></canvas>
+<div class="cursor" id="cursor"></div>
 
-  <div class="content">
-    <h1>aaaaaamuuaarere.netへようこそ！</h1>
+<div class="container">
+  <div class="glass">
+
+<h1><a href="#" id="siteTitle" class="flow-text"><span id="typing"></span></a><span class="cursor-blink"></span></h1>
+
+<div class="clock" id="clock"></div>
+
+<div class="subtitle">Hello, I'm YOUR NAME.</div>
+
+    <div class="section">
+      <h2>About</h2>
+      <p>I'm still a beginner developer exploring interactive web design.</p>
+    </div>
+
+    <div class="section">
+      <h2>Links</h2>
+
+      <div class="social-links">
+        <a href="https://scratch.mit.edu/users/aaaaaaaaaaamuuaarere" target="_blank">Scratch</a>
+        <a href="https://discord.com/users/1435948880863821945" target="_blank">Discord</a>
+        <a href="https://discord.gg/fNEnX2egHr" target="_blank">Discord Server</a>
+        <a href="https://github.com/2gbmemory" target="_blank">GitHub</a>
+        <a href="https://youtube.com/@aaaaaaaaaaamuuaarere" target="_blank">YouTube</a>
+      </div>
+
+      <div class="footer-note">
+        This website was also created by AI.
+      </div>
+    </div>
+
   </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+
+// タイピング
+const text="aaaaaamuuaarere.net";
+let i=0;
+function typeWriter(){
+  if(i<text.length){
+    document.getElementById("typing").innerHTML+=text.charAt(i);
+    i++;
+    setTimeout(typeWriter,80);
+  }
+}
+window.onload=typeWriter;
+
+// 時計
+function updateClock(){
+  const now = new Date();
+  const h = String(now.getHours()).padStart(2,'0');
+  const m = String(now.getMinutes()).padStart(2,'0');
+  const s = String(now.getSeconds()).padStart(2,'0');
+  document.getElementById("clock").textContent = h + ":" + m + ":" + s;
+}
+setInterval(updateClock,1000);
+updateClock();
+
+// クリックで青白アニメーション
+const siteTitle = document.getElementById("siteTitle");
+siteTitle.addEventListener("click", (e) => {
+  e.preventDefault();
+  siteTitle.classList.add("active");
+  setTimeout(()=>{
+    siteTitle.classList.remove("active");
+  },3000);
+});
+
+// スクロール表示
+const sections=document.querySelectorAll('.section');
+window.addEventListener('scroll',()=>{
+  sections.forEach(section=>{
+    const rect=section.getBoundingClientRect();
+    if(rect.top<window.innerHeight-100){
+      section.classList.add('visible');
+    }
+  });
+});
+
+// カーソル
+const cursor=document.getElementById("cursor");
+document.addEventListener("mousemove",(e)=>{
+  cursor.style.left=e.clientX+"px";
+  cursor.style.top=e.clientY+"px";
+});
+
+// WebGL流体
+const scene=new THREE.Scene();
+const camera=new THREE.OrthographicCamera(-1,1,1,-1,0,1);
+const renderer=new THREE.WebGLRenderer({canvas:document.getElementById("fluid"),alpha:true});
+renderer.setSize(window.innerWidth,window.innerHeight);
+
+const uniforms={
+  time:{value:0},
+  resolution:{value:new THREE.Vector2(window.innerWidth,window.innerHeight)}
+};
+
+const material=new THREE.ShaderMaterial({
+  transparent:true,
+  uniforms:uniforms,
+  fragmentShader:`
+    uniform float time;
+    uniform vec2 resolution;
+    void main(){
+      vec2 uv=gl_FragCoord.xy/resolution.xy;
+      float wave=sin(uv.x*6.0+time)*0.08;
+      float wave2=cos(uv.y*6.0+time)*0.08;
+      float c=wave+wave2;
+      gl_FragColor=vec4(vec3(0.3)*c,0.25);
+    }
+  `
+});
+
+const geometry=new THREE.PlaneGeometry(2,2);
+const mesh=new THREE.Mesh(geometry,material);
+scene.add(mesh);
+
+function animate(){
+  uniforms.time.value+=0.015;
+  renderer.render(scene,camera);
+  requestAnimationFrame(animate);
+}
+animate();
+
+window.addEventListener("resize",()=>{
+  renderer.setSize(window.innerWidth,window.innerHeight);
+  uniforms.resolution.value.set(window.innerWidth,window.innerHeight);
+});
+</script>
 
 </body>
 </html>
